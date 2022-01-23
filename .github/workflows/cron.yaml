@@ -1,12 +1,12 @@
-name: Every-two-minutes cron job
+name: cron job
 on:
   schedule:
-    - cron: '*/2 * * * *'
+    - cron: '*/10 * * * *'
 jobs:
   cron:
     runs-on: ubuntu-latest
     steps:
-      - name: Two-minute cron job
+      - name: send mail
         run: |
           curl --request POST \
           --url 'https://scrape-city.vercel.app/api/mail' \
