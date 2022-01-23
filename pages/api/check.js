@@ -1,27 +1,7 @@
 import getArtists from '../../lib/getArtists';
 import getReleases from '../../lib/getReleases';
 
-import sendMail from '../../lib/mailer';
-import {
-  getHtmlResults,
-  getTextResults,
-  sanitizeString,
-} from '../../lib/utils';
-
-function generateMail(releases) {
-  if (releases.length === 0) {
-    const message = 'No results today';
-    const htmlMessage = `<p>${message}</p>`;
-
-    sendMail(htmlMessage, message);
-    return;
-  }
-
-  const html = getHtmlResults(releases);
-  const text = getTextResults(releases);
-
-  sendMail(html, text);
-}
+import { sanitizeString } from '../../lib/utils';
 
 export default async function handler(_, res) {
   try {
