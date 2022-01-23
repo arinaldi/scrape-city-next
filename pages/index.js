@@ -44,7 +44,7 @@ export default function Home() {
       <main className={styles.main}>
         <h1 className={styles.title}>Scrape City</h1>
         <button disabled={isLoading} onClick={getData}>
-          {isLoading ? 'Checking...' : 'Check releases'}
+          {isLoading ? 'Checking...' : 'Check Releases'}
         </button>
         {data.length > 0 ? (
           <ul className={styles.data}>
