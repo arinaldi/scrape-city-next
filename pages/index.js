@@ -11,7 +11,11 @@ export default function Home() {
     try {
       setIsLoading(true);
       setMessage('');
-      const response = await fetch('/api/check');
+      const response = await fetch('/api/check', {
+        headers: {
+          authorization: process.env.NEXT_PUBLIC_APP_KEY,
+        },
+      });
       const { error, releases, success } = await response.json();
 
       if (success) {
