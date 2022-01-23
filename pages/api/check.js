@@ -29,7 +29,6 @@ export default async function handler(_, res) {
     const artists = new Set(data.map((artist) => sanitizeString(artist)));
 
     const releases = await getReleases(artists);
-    // generateMail(releases);
 
     res.status(200).json({ success: true, releases });
   } catch (error) {

@@ -1,0 +1,13 @@
+name: Every-two-minutes cron job
+on:
+  schedule:
+    - cron: '*/2 * * * *'
+jobs:
+  cron:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Two-minute cron job
+        run: |
+          curl --request POST \
+          --url 'https://scrape-city.vercel.app/api/mail' \
+          --header 'Authorization: ${{ secrets.ACTION_KEY }}'
