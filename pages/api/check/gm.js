@@ -1,6 +1,5 @@
 import getArtists from '../../../lib/getArtists';
 import getMetalReleases from '../../../lib/getMetalReleases';
-
 import { sanitizeString } from '../../../lib/utils';
 
 export default async function handler(req, res) {
