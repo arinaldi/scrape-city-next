@@ -8,7 +8,6 @@ export default async function handler(req, res) {
     try {
       const data = await getArtists();
       const artists = new Set(data.map((artist) => sanitizeString(artist)));
-
       const releases = await getMetalReleases(artists);
 
       res.status(200).json({ success: true, releases });
