@@ -12,13 +12,13 @@
   font-size: 4rem;
 }
 
-.data {
-  margin: 12px 0;
+.container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
 }
 
-@media (max-width: 600px) {
-  .grid {
-    width: 100%;
-    flex-direction: column;
-  }
+.data {
+  margin: 12px 0;
 }

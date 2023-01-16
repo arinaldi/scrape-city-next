@@ -7,11 +7,11 @@ export default function Home() {
   const [message, setMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
-  async function getData() {
+  async function getData(url) {
     try {
       setIsLoading(true);
       setMessage('');
-      const response = await fetch('/api/check', {
+      const response = await fetch(url, {
         headers: {
           authorization: process.env.NEXT_PUBLIC_APP_KEY,
         },
@@ -43,9 +43,17 @@ export default function Home() {
       </Head>
       <main className={styles.main}>
         <h1 className={styles.title}>Scrape City</h1>
-        <button disabled={isLoading} onClick={getData}>
-          {isLoading ? 'Checking...' : 'Check Releases'}
-        </button>
+        <div className={styles.container}>
+          <button
+            disabled={isLoading}
+            onClick={() => getData('/api/check/nar')}
+          >
+            Check NAR
+          </button>
+          <button disabled={isLoading} onClick={() => getData('/api/check/gm')}>
+            Check GM
+          </button>
+        </div>
         {data.length > 0 ? (
           <ul className={styles.data}>
             {data.map(({ link, title }) => (
