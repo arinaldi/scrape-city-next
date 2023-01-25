@@ -12,6 +12,7 @@ body {
 
 button {
   cursor: pointer;
-  font-size: 1.5rem;
+  font-size: 1rem;
+  min-width: 96px;
   padding: 8px 12px;
 }

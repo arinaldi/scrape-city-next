@@ -48,10 +48,16 @@ export default function Home() {
             disabled={isLoading}
             onClick={() => getData('/api/check/nar')}
           >
-            Check NAR
+            NAR
           </button>
           <button disabled={isLoading} onClick={() => getData('/api/check/gm')}>
-            Check GM
+            GM
+          </button>
+          <button
+            disabled={isLoading}
+            onClick={() => getData('/api/check/gm-rss')}
+          >
+            GM RSS
           </button>
         </div>
         {data.length > 0 ? (
