@@ -2,6 +2,7 @@
 import { useState } from 'react';
 
 import { Button } from '@/components/ui/button';
+import { Spinner } from '@/components/ui/spinner';
 import { ThemeToggle } from '@/components/theme-toggle';
 import { Post } from '@/lib/utils';
 import { FnType, getData } from './actions';
@@ -53,7 +54,7 @@ export default function Home() {
   }
 
   return (
-    <main className="relative flex flex-col items-center justify-between p-6 gap-4">
+    <main className="relative flex flex-col items-center justify-between p-6 gap-6">
       <div className="absolute right-2 top-2">
         <ThemeToggle />
       </div>
@@ -66,6 +67,7 @@ export default function Home() {
           GM
         </Button>
       </div>
+      {state.isLoading && <Spinner />}
       {state.data.length > 0 && (
         <ul className="list-disc text-sm ml-4">
           {state.data.map(({ link, title }) => (
