@@ -1,16 +1,22 @@
-import subtract from 'date-fns/sub';
-import isAfter from 'date-fns/isAfter';
+import { type ClassValue, clsx } from 'clsx';
+import { twMerge } from 'tailwind-merge';
+import { sub } from 'date-fns/sub';
+import { isAfter } from 'date-fns/isAfter';
 
-export function checkNarDate(lastPostDate) {
+export function cn(...inputs: ClassValue[]) {
+  return twMerge(clsx(inputs));
+}
+
+export function checkNarDate(lastPostDate: string) {
   const dateString = lastPostDate.replace(' On ', '').replace(/-/g, '');
   const postDate = new Date(dateString);
-  const dateToCheck = subtract(new Date(), { days: 2 });
+  const dateToCheck = sub(new Date(), { days: 2 });
   const shouldContinue = isAfter(postDate, dateToCheck);
 
   return shouldContinue;
 }
 
-export function checkGmDate(lastPostDate) {
+export function checkGmDate(lastPostDate: string) {
   const [_, dateString] = lastPostDate.split('| ');
 
   if (!dateString) return false;
@@ -21,7 +27,7 @@ export function checkGmDate(lastPostDate) {
   return shouldContinue;
 }
 
-const config = {
+const config: RequestInit = {
   headers: {
     Accept:
       'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
@@ -46,14 +52,14 @@ const config = {
   // credentials: 'include',
 };
 
-export async function getHtml(url) {
+export async function getHtml(url: string) {
   const res = await fetch(url, config);
   const html = await res.text();
 
   return html;
 }
 
-export function sanitizeString(value) {
+export function sanitizeString(value: string) {
   return value
     .trim()
     .toLowerCase()
@@ -68,7 +74,12 @@ export function sanitizeString(value) {
     .replace(/ö/g, 'o');
 }
 
-export function sortData(data) {
+export interface Post {
+  link: string;
+  title: string;
+}
+
+export function sortData(data: Post[]) {
   return data.sort((a, b) =>
     a.title.toLowerCase() > b.title.toLowerCase() ? 1 : -1
   );
