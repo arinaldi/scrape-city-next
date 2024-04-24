@@ -6,7 +6,7 @@ export function Spinner({ className = 'size-6' }: Props) {
   return (
     <div className={className}>
       <svg
-        className="animate-spin"
+        className="animate-spin duration-500"
         xmlns="http://www.w3.org/2000/svg"
         fill="none"
         viewBox="0 0 24 24"
