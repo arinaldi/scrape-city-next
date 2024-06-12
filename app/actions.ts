@@ -14,6 +14,8 @@ const PA_NEXT_API = process.env.PA_NEXT_API as string;
 const NAR_URL = process.env.NAR_URL as string;
 const GM_URL = process.env.GM_URL as string;
 const GRM_URL = process.env.GRM_URL as string;
+const SPOTIFY_CLIENT_ID = process.env.SPOTIFY_CLIENT_ID as string;
+const SPOTIFY_CLIENT_SECRET = process.env.SPOTIFY_CLIENT_SECRET as string;
 
 async function getArtists() {
   const res = await fetch(PA_NEXT_API);
@@ -118,10 +120,83 @@ async function getRockReleases(artists: Set<string>, page = 1) {
   return results.length > 0 ? sortData(results) : results;
 }
 
+async function getSpotifyToken() {
+  const res = await fetch('https://accounts.spotify.com/api/token', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded',
+    },
+    body: `grant_type=client_credentials&client_id=${SPOTIFY_CLIENT_ID}&client_secret=${SPOTIFY_CLIENT_SECRET}`,
+  });
+  const data = await res.json();
+
+  return data?.access_token ?? null;
+}
+
+interface SpotifyItem {
+  album_type: string;
+  total_tracks: number;
+  external_urls: {
+    spotify: string;
+  };
+  id: string;
+  name: string;
+  release_date: string;
+  artists: {
+    id: string;
+    name: string;
+  }[];
+}
+
+interface SpotifyData {
+  albums: {
+    href: string;
+    total: number;
+    items: SpotifyItem[];
+  };
+}
+
+export interface Result {
+  link: string;
+  title: string;
+}
+
+export async function getSpotifyReleases(
+  artists: Set<string>
+): Promise<Result[]> {
+  const token = await getSpotifyToken();
+
+  if (!token) return [];
+
+  const res = await fetch(
+    `https://api.spotify.com/v1/browse/new-releases?limit=50&offset=0`,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+  const data: SpotifyData = await res.json();
+
+  data?.albums?.items.forEach((item) => {
+    const artist = sanitizeString(item.artists[0].name);
+
+    if (artists.has(artist)) {
+      results.push({
+        link: item.external_urls.spotify,
+        title: `${item.artists[0].name} - ${item.name}`,
+      });
+    }
+  });
+
+  return results.length > 0 ? sortData(results) : results;
+}
+
 const fnMap = {
   nar: getNewReleases,
   gm: getMetalReleases,
   grm: getRockReleases,
+  spy: getSpotifyReleases,
 };
 
 export type FnType = keyof typeof fnMap;

@@ -69,6 +69,9 @@ export default function Home() {
         <Button disabled={state.isLoading} onClick={() => onClick('grm')}>
           GRM
         </Button>
+        <Button disabled={state.isLoading} onClick={() => onClick('spy')}>
+          SPY
+        </Button>
       </div>
       {state.isLoading && <Spinner />}
       {state.data.length > 0 && (
