@@ -160,14 +160,9 @@ interface SpotifyData {
   };
 }
 
-export interface Result {
-  link: string;
-  title: string;
-}
-
 export async function getSpotifyReleases(
   artists: Set<string>
-): Promise<Result[]> {
+): Promise<Post[]> {
   const token = await getSpotifyToken();
 
   if (!token) return [];
