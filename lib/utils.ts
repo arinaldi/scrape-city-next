@@ -79,8 +79,6 @@ export interface Post {
   title: string;
 }
 
-export function sortData(data: Post[]) {
-  return data.sort((a, b) =>
-    a.title.toLowerCase() > b.title.toLowerCase() ? 1 : -1
-  );
+export function sortByTitle(a: Post, b: Post) {
+  return a.title.localeCompare(b.title);
 }

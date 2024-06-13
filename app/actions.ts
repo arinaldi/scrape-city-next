@@ -6,7 +6,7 @@ import {
   checkNarDate,
   getHtml,
   sanitizeString,
-  sortData,
+  sortByTitle,
   type Post,
 } from '@/lib/utils';
 
@@ -24,9 +24,8 @@ async function getArtists() {
   return data.artists as string[];
 }
 
-const results: Post[] = [];
-
 async function getNewReleases(artists: Set<string>, page = 1) {
+  const results: Post[] = [];
   const url = page === 1 ? NAR_URL : `${NAR_URL}/page/${page}`;
   const html = await getHtml(url);
   const $ = cheerio.load(html);
@@ -53,10 +52,11 @@ async function getNewReleases(artists: Set<string>, page = 1) {
     return await getNewReleases(artists, page + 1);
   }
 
-  return results.length > 0 ? sortData(results) : results;
+  return results.sort(sortByTitle);
 }
 
 async function getMetalReleases(artists: Set<string>, page = 1) {
+  const results: Post[] = [];
   const url = `${GM_URL}/page/${page}`;
   const html = await getHtml(url);
   const $ = cheerio.load(html);
@@ -84,10 +84,11 @@ async function getMetalReleases(artists: Set<string>, page = 1) {
     return await getMetalReleases(artists, page + 1);
   }
 
-  return results.length > 0 ? sortData(results) : results;
+  return results.sort(sortByTitle);
 }
 
 async function getRockReleases(artists: Set<string>, page = 1) {
+  const results: Post[] = [];
   const url = page === 1 ? GRM_URL : `${GRM_URL}/page/${page}`;
   const html = await getHtml(url);
   const $ = cheerio.load(html);
@@ -117,7 +118,7 @@ async function getRockReleases(artists: Set<string>, page = 1) {
     return await getRockReleases(artists, page + 1);
   }
 
-  return results.length > 0 ? sortData(results) : results;
+  return results.sort(sortByTitle);
 }
 
 async function getSpotifyToken() {
@@ -168,6 +169,7 @@ export async function getSpotifyReleases(
 
   if (!token) return [];
 
+  const results: Post[] = [];
   const res = await fetch(
     `https://api.spotify.com/v1/browse/new-releases?limit=50&offset=0`,
     {
@@ -189,7 +191,7 @@ export async function getSpotifyReleases(
     }
   });
 
-  return results.length > 0 ? sortData(results) : results;
+  return results.sort(sortByTitle);
 }
 
 const fnMap = {
