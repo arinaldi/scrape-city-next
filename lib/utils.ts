@@ -75,6 +75,7 @@ export function sanitizeString(value: string) {
 }
 
 export interface Post {
+  id: string;
   link: string;
   title: string;
 }

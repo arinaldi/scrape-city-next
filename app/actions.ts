@@ -17,24 +17,23 @@ const GRM_URL = process.env.GRM_URL as string;
 const SPOTIFY_CLIENT_ID = process.env.SPOTIFY_CLIENT_ID as string;
 const SPOTIFY_CLIENT_SECRET = process.env.SPOTIFY_CLIENT_SECRET as string;
 
-async function getArtists() {
-  const res = await fetch(PA_NEXT_API);
-  const data = await res.json();
-
-  return data.artists as string[];
-}
+const results: Post[] = [];
 
 async function getNewReleases(artists: Set<string>, page = 1) {
-  const results: Post[] = [];
   const url = page === 1 ? NAR_URL : `${NAR_URL}/page/${page}`;
   const html = await getHtml(url);
   const $ = cheerio.load(html);
   const posts = $('.title > h2 > a')
     .get()
-    .map((p) => ({
-      title: p.attribs.title.replace('Permanent Link to ', ''),
-      link: p.attribs.href,
-    }));
+    .map((p) => {
+      const title = p.attribs.title.replace('Permanent Link to ', '');
+
+      return {
+        id: `${title}-${Date.now()}`,
+        link: p.attribs.href,
+        title,
+      };
+    });
   const lastPostDate = $('.clock').last().text();
   const shouldContinue = checkNarDate(lastPostDate);
 
@@ -56,17 +55,21 @@ async function getNewReleases(artists: Set<string>, page = 1) {
 }
 
 async function getMetalReleases(artists: Set<string>, page = 1) {
-  const results: Post[] = [];
   const url = `${GM_URL}/page/${page}`;
   const html = await getHtml(url);
   const $ = cheerio.load(html);
   const posts = $('span.ntitle > a')
     .get()
-    .map((p) => ({
+    .map((p) => {
       // @ts-ignore
-      title: p.children[0].data,
-      link: p.attribs.href,
-    }));
+      const title = p.children[0].data;
+
+      return {
+        id: `${title}-${Date.now()}`,
+        link: p.attribs.href,
+        title,
+      };
+    });
   const lastPostDate = $('td.slink > strong').last().parent().text();
   const shouldContinue = checkGmDate(lastPostDate);
 
@@ -88,7 +91,6 @@ async function getMetalReleases(artists: Set<string>, page = 1) {
 }
 
 async function getRockReleases(artists: Set<string>, page = 1) {
-  const results: Post[] = [];
   const url = page === 1 ? GRM_URL : `${GRM_URL}/page/${page}`;
   const html = await getHtml(url);
   const $ = cheerio.load(html);
@@ -108,8 +110,9 @@ async function getRockReleases(artists: Set<string>, page = 1) {
 
     if (artists.has(artist)) {
       results.push({
-        title: `${b} - ${albums[i]}`,
+        id: `${albums[i]}-${Date.now()}`,
         link: links[i],
+        title: `${b} - ${albums[i]}`,
       });
     }
   });
@@ -169,7 +172,6 @@ export async function getSpotifyReleases(
 
   if (!token) return [];
 
-  const results: Post[] = [];
   const res = await fetch(
     `https://api.spotify.com/v1/browse/new-releases?limit=50&offset=0`,
     {
@@ -185,6 +187,7 @@ export async function getSpotifyReleases(
 
     if (artists.has(artist)) {
       results.push({
+        id: item.id,
         link: item.external_urls.spotify,
         title: `${item.artists[0].name} - ${item.name}`,
       });
@@ -202,6 +205,13 @@ const fnMap = {
 };
 
 export type FnType = keyof typeof fnMap;
+
+async function getArtists() {
+  const res = await fetch(PA_NEXT_API);
+  const data = await res.json();
+
+  return data.artists as string[];
+}
 
 export async function getData(type: FnType) {
   const data = await getArtists();

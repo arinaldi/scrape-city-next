@@ -76,8 +76,8 @@ export default function Home() {
       {state.isLoading && <Spinner />}
       {state.data.length > 0 && (
         <ul className="list-disc text-sm ml-4">
-          {state.data.map(({ link, title }) => (
-            <li key={link}>
+          {state.data.map(({ id, link, title }) => (
+            <li key={id}>
               <a
                 className="underline text-blue-600 dark:text-blue-400"
                 href={link}
