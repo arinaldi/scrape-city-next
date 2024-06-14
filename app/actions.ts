@@ -176,20 +176,33 @@ export async function getSpotifyReleases(
     }
   );
   const data: SpotifyData = await res.json();
+  const matched: Post[] = [];
+  const unmatched: Post[] = [];
 
   data?.albums?.items.forEach((item) => {
     const artist = sanitizeString(item.artists[0].name);
+    const release = {
+      id: item.id,
+      link: item.external_urls.spotify,
+      title: `${item.artists[0].name} - ${item.name}`,
+    };
 
     if (artists.has(artist)) {
-      results.push({
-        id: item.id,
-        link: item.external_urls.spotify,
-        title: `${item.artists[0].name} - ${item.name}`,
-      });
+      matched.push(release);
+    } else {
+      unmatched.push(release);
     }
   });
 
-  return results.sort(sortByTitle);
+  return [
+    ...matched.sort(sortByTitle),
+    {
+      id: Date.now().toString(),
+      link: '',
+      title: '',
+    },
+    ...unmatched.sort(sortByTitle),
+  ];
 }
 
 const fnMap = {

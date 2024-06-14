@@ -75,19 +75,25 @@ export default function Home() {
       </div>
       {state.isLoading && <Spinner />}
       {state.data.length > 0 && (
-        <ul className="list-disc text-sm ml-4">
-          {state.data.map(({ id, link, title }) => (
-            <li key={id}>
-              <a
-                className="underline text-blue-600 dark:text-blue-400"
-                href={link}
-                rel="noreferrer noopener"
-                target="_blank"
-              >
-                {title}
-              </a>
-            </li>
-          ))}
+        <ul className="list-disc text-sm ml-4 space-y-0.5">
+          {state.data.map(({ id, link, title }) => {
+            if (!title) {
+              return <hr className="!my-4 -ml-4" key={id} />;
+            }
+
+            return (
+              <li key={id}>
+                <a
+                  className="underline text-blue-600 dark:text-blue-400"
+                  href={link}
+                  rel="noreferrer noopener"
+                  target="_blank"
+                >
+                  {title}
+                </a>
+              </li>
+            );
+          })}
         </ul>
       )}
       <div className="text-sm">{state.message}</div>
