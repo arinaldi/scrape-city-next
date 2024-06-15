@@ -94,26 +94,22 @@ async function getRockReleases(artists: Set<string>, page = 1) {
   const url = page === 1 ? GRM_URL : `${GRM_URL}/page/${page}`;
   const html = await getHtml(url);
   const $ = cheerio.load(html);
-  const bands = $('div.ssinfo > a')
+  const posts = $('h2.title > a')
     .get()
-    .map((p) => p.attribs.title);
-  const albums = $('ul.ssigcrf')
-    .get()
-    // @ts-ignore);
-    .map((a, i) => a.previousSibling?.data.trim());
-  const links = $('div.ssdownload > a')
-    .get()
-    .map((l) => l.attribs.href);
+    .map((p) => ({
+      id: `${p.attribs.href}-${Date.now()}`,
+      link: p.attribs.href,
+      // @ts-ignore
+      title: p.children[0].data,
+    }));
 
-  bands.forEach((b, i) => {
-    const artist = sanitizeString(b);
+  posts.forEach((p) => {
+    const enDashIndex = p.title.indexOf('-');
+    const title = p.title.substring(0, enDashIndex);
+    const artist = sanitizeString(title);
 
     if (artists.has(artist)) {
-      results.push({
-        id: `${albums[i]}-${Date.now()}`,
-        link: links[i],
-        title: `${b} - ${albums[i]}`,
-      });
+      results.push(p);
     }
   });
 
@@ -214,11 +210,15 @@ const fnMap = {
 
 export type FnType = keyof typeof fnMap;
 
+interface PaResponse {
+  artists: string[];
+}
+
 async function getArtists() {
   const res = await fetch(PA_NEXT_API);
-  const data = await res.json();
+  const { artists }: PaResponse = await res.json();
 
-  return data.artists as string[];
+  return artists;
 }
 
 export async function getData(type: FnType) {
