@@ -122,11 +122,12 @@ async function getRockReleases(artists: Set<string>, page = 1) {
 
 async function getSpotifyToken() {
   const res = await fetch('https://accounts.spotify.com/api/token', {
-    method: 'POST',
+    body: `grant_type=client_credentials&client_id=${SPOTIFY_CLIENT_ID}&client_secret=${SPOTIFY_CLIENT_SECRET}`,
+    cache: 'no-store',
     headers: {
       'Content-Type': 'application/x-www-form-urlencoded',
     },
-    body: `grant_type=client_credentials&client_id=${SPOTIFY_CLIENT_ID}&client_secret=${SPOTIFY_CLIENT_SECRET}`,
+    method: 'POST',
   });
   const data = await res.json();
 
@@ -166,6 +167,7 @@ export async function getSpotifyReleases(
   const res = await fetch(
     `https://api.spotify.com/v1/browse/new-releases?limit=50&offset=0`,
     {
+      cache: 'no-store',
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -215,7 +217,7 @@ interface PaResponse {
 }
 
 async function getArtists() {
-  const res = await fetch(PA_NEXT_API);
+  const res = await fetch(PA_NEXT_API, { cache: 'no-store' });
   const { artists }: PaResponse = await res.json();
 
   return artists;
