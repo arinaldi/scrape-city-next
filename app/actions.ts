@@ -152,9 +152,25 @@ interface SpotifyItem {
 interface SpotifyData {
   albums: {
     href: string;
-    total: number;
     items: SpotifyItem[];
+    limit: number;
+    next: string | null;
+    offset: number;
+    previous: string | null;
+    total: number;
   };
+}
+
+async function fetchSpotify(url: string, token: string) {
+  const res = await fetch(url, {
+    cache: 'no-store',
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  const data: SpotifyData = await res.json();
+
+  return data;
 }
 
 export async function getSpotifyReleases(
@@ -164,43 +180,32 @@ export async function getSpotifyReleases(
 
   if (!token) return [];
 
-  const res = await fetch(
-    `https://api.spotify.com/v1/browse/new-releases?limit=50&offset=0`,
-    {
-      cache: 'no-store',
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    }
-  );
-  const data: SpotifyData = await res.json();
+  const [page1, page2] = await Promise.all([
+    fetchSpotify(
+      `https://api.spotify.com/v1/browse/new-releases?limit=50&offset=0`,
+      token
+    ),
+    fetchSpotify(
+      `https://api.spotify.com/v1/browse/new-releases?limit=50&offset=50`,
+      token
+    ),
+  ]);
   const matched: Post[] = [];
-  const unmatched: Post[] = [];
 
-  data?.albums?.items.forEach((item) => {
-    const artist = sanitizeString(item.artists[0].name);
+  [...page1.albums.items, ...page2.albums.items].forEach((a) => {
+    const artist = sanitizeString(a.artists[0].name);
     const release = {
-      id: item.id,
-      link: item.external_urls.spotify,
-      title: `${item.artists[0].name} - ${item.name}`,
+      id: a.id,
+      link: a.external_urls.spotify,
+      title: `${a.artists[0].name} - ${a.name}`,
     };
 
     if (artists.has(artist)) {
       matched.push(release);
-    } else {
-      unmatched.push(release);
     }
   });
 
-  return [
-    ...matched.sort(sortByTitle),
-    {
-      id: Date.now().toString(),
-      link: '',
-      title: '',
-    },
-    ...unmatched.sort(sortByTitle),
-  ];
+  return matched.sort(sortByTitle);
 }
 
 const fnMap = {
