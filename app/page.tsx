@@ -7,6 +7,8 @@ import { ThemeToggle } from '@/components/theme-toggle';
 import { Post } from '@/lib/utils';
 import { FnType, getData } from './actions';
 
+export const dynamic = 'force-dynamic';
+
 interface State {
   data: Post[];
   isLoading: boolean;
